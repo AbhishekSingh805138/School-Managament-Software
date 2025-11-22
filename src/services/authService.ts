@@ -245,6 +245,93 @@ export class AuthService extends BaseService {
     return { success: true };
   }
 
+  async updateProfile(userId: string, updateData: any) {
+    // Build dynamic update query
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
+
+    if (updateData.firstName) {
+      updates.push(`first_name = $${paramCount++}`);
+      values.push(updateData.firstName);
+    }
+    if (updateData.lastName) {
+      updates.push(`last_name = $${paramCount++}`);
+      values.push(updateData.lastName);
+    }
+    if (updateData.phone) {
+      updates.push(`phone = $${paramCount++}`);
+      values.push(updateData.phone);
+    }
+    if (updateData.dateOfBirth) {
+      updates.push(`date_of_birth = $${paramCount++}`);
+      values.push(updateData.dateOfBirth);
+    }
+    if (updateData.address) {
+      updates.push(`address = $${paramCount++}`);
+      values.push(updateData.address);
+    }
+
+    if (updates.length === 0) {
+      throw new AppError('No fields to update', 400);
+    }
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(userId);
+
+    const query = `
+      UPDATE users 
+      SET ${updates.join(', ')}
+      WHERE id = $${paramCount}
+      RETURNING id, alt_id, first_name, last_name, email, role, phone, date_of_birth, address, is_active, created_at, updated_at
+    `;
+
+    const result = await this.executeQuery(query, values);
+
+    if (result.rows.length === 0) {
+      throw new AppError('User not found', 404);
+    }
+
+    return this.transformUserResponse(result.rows[0]);
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    // Get current password hash
+    const result = await this.executeQuery(
+      'SELECT password_hash FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('User not found', 404);
+    }
+
+    const user = result.rows[0];
+
+    // Verify current password
+    const isPasswordValid = await comparePassword(currentPassword, user.password_hash);
+    if (!isPasswordValid) {
+      throw new AppError('Current password is incorrect', 401);
+    }
+
+    // Hash new password
+    const newPasswordHash = await hashPassword(newPassword);
+
+    // Update password
+    await this.executeQuery(
+      'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [newPasswordHash, userId]
+    );
+
+    // Invalidate all refresh tokens for security
+    await this.executeQuery(
+      'UPDATE refresh_tokens SET is_active = false WHERE user_id = $1',
+      [userId]
+    );
+
+    return { success: true };
+  }
+
   private transformUserResponse(user: any) {
     return {
       id: user.id,

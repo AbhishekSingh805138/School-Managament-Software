@@ -16,6 +16,8 @@ router.post('/register', rateLimiting_1.registrationRateLimit, sanitization_1.sa
 router.post('/login', rateLimiting_1.authRateLimit, (0, validation_1.validateBody)(user_1.LoginSchema), authController_1.login);
 router.post('/refresh', (0, validation_1.validateBody)(RefreshTokenSchema), authController_1.refreshToken);
 router.get('/profile', auth_1.authenticate, authController_1.getProfile);
+router.put('/profile', auth_1.authenticate, sanitization_1.sanitizeUser, (0, validation_1.validateBody)(user_1.UpdateUserSchema.partial()), authController_1.updateProfile);
+router.post('/change-password', auth_1.authenticate, (0, validation_1.validateBody)(user_1.ChangePasswordSchema), authController_1.changePassword);
 router.post('/logout', (0, validation_1.validateBody)(RefreshTokenSchema), authController_1.logout);
 router.post('/logout-all', auth_1.authenticate, authController_1.logoutAll);
 exports.default = router;

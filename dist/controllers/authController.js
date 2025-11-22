@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProfile = exports.logoutAll = exports.logout = exports.refreshToken = exports.getCurrentUser = exports.login = exports.register = void 0;
+exports.changePassword = exports.updateProfile = exports.getProfile = exports.logoutAll = exports.logout = exports.refreshToken = exports.getCurrentUser = exports.login = exports.register = void 0;
 const errorHandler_1 = require("../middleware/errorHandler");
 const authService_1 = require("../services/authService");
 const auditLogger_1 = require("../middleware/auditLogger");
@@ -89,4 +89,23 @@ exports.logoutAll = (0, errorHandler_1.asyncHandler)(async (req, res) => {
     });
 });
 exports.getProfile = exports.getCurrentUser;
+exports.updateProfile = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const userId = req.user.id;
+    const updateData = req.body;
+    const updatedUser = await authService.updateProfile(userId, updateData);
+    res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: updatedUser,
+    });
+});
+exports.changePassword = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(userId, currentPassword, newPassword);
+    res.json({
+        success: true,
+        message: 'Password changed successfully',
+    });
+});
 //# sourceMappingURL=authController.js.map

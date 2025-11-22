@@ -121,3 +121,30 @@ export const logoutAll = asyncHandler(async (req: Request, res: Response) => {
 
 // Alias for backward compatibility
 export const getProfile = getCurrentUser;
+
+// Update user profile
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const updateData = req.body;
+
+  const updatedUser = await authService.updateProfile(userId, updateData);
+
+  res.json({
+    success: true,
+    message: 'Profile updated successfully',
+    data: updatedUser,
+  });
+});
+
+// Change password
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const { currentPassword, newPassword } = req.body;
+
+  await authService.changePassword(userId, currentPassword, newPassword);
+
+  res.json({
+    success: true,
+    message: 'Password changed successfully',
+  });
+});

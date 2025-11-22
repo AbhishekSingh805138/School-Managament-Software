@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>
+  <mat-icon>edit</mat-icon>
+  Edit Profile
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="profileForm" class="profile-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName" placeholder="Enter first name">
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-error *ngIf="profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched">
+        {{ getErrorMessage('firstName') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName" placeholder="Enter last name">
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-error *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+        {{ getErrorMessage('lastName') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="Enter email">
+      <mat-icon matPrefix>email</mat-icon>
+      <mat-error *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+        {{ getErrorMessage('email') }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Phone</mat-label>
+      <input matInput type="tel" formControlName="phone" placeholder="Enter phone number">
+      <mat-icon matPrefix>phone</mat-icon>
+      <mat-error *ngIf="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+        {{ getErrorMessage('phone') }}
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSubmitting">
+    Cancel
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+    <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+    <span *ngIf="!isSubmitting">Save Changes</span>
+  </button>
+</mat-dialog-actions>

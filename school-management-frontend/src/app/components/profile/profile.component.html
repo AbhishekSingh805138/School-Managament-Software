@@ -83,11 +83,11 @@
     </div>
 
     <mat-card-actions>
-      <button mat-raised-button color="primary">
+      <button mat-raised-button color="primary" (click)="onEditProfile()">
         <mat-icon>edit</mat-icon>
         Edit Profile
       </button>
-      <button mat-raised-button>
+      <button mat-raised-button (click)="onChangePassword()">
         <mat-icon>lock</mat-icon>
         Change Password
       </button>
